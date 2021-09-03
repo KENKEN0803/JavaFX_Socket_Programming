@@ -9,10 +9,71 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+
+
+class ServerThreadC extends Thread {
+    Socket ss;
+    Client client;
+
+    ServerThreadC(Socket ss, Client client) {
+        this.ss = ss;
+        this.client = client;
+    }
+
+    @Override
+    public void run() {
+        InputStream inputStream = null;
+
+        while (true) {
+            try {
+                ArrayList<String> list = new ArrayList<String>();
+
+                inputStream = ss.getInputStream();
+                byte[] data = new byte[512];
+                int size = inputStream.read(data);//블로킹
+                String inputData = new String(data, 0, size, StandardCharsets.UTF_8);
+                String clientAddress = ss.getInetAddress().getHostName();
+                client.textArea.appendText(inputData);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+
+
+class ConnectThreadC extends Thread {
+    Client client;
+
+    ConnectThreadC(Client client) {
+        this.client = client;
+    }
+
+    @Override
+    public void run() {
+        try {
+            ServerSocket mss = new ServerSocket();
+            int port = 5002;
+            client.textArea.appendText("소캣 생성 완료\n");
+            mss.bind(new InetSocketAddress(InetAddress.getLocalHost(), port));
+            client.textArea.appendText("바인딩 완료\n" + port + "번 포트에서 서버 응답 대기중...\n");
+            while (true) {
+                Socket ss = mss.accept(); // 블로킹
+                new ServerThreadC(ss, client).start();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
 
 
 class ClientThread extends Thread {
@@ -27,9 +88,9 @@ class ClientThread extends Thread {
         try {
             Socket cs = new Socket();
 
-            String Serverip = "61.83.118.69";
+            String ServerIp = "61.83.118.69";
             int port = 5001;
-            cs.connect(new InetSocketAddress(Serverip, port));
+            cs.connect(new InetSocketAddress(ServerIp, port));
             OutputStream outputStream = cs.getOutputStream();
 
             String input = client.textField.getText(); // 텍스트필드에서 텍스트 가져옴
@@ -58,7 +119,7 @@ public class Client extends Application {
         // -----------------------------------------------------------------------
 
         btn1.setOnAction(actionEvent -> {
-//            new ClientThread().start();
+            new ConnectThreadC(this).start();
         });
 
         textField.setOnAction(actionEvent -> {

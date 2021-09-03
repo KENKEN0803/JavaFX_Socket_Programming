@@ -9,12 +9,39 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+
+class SubmitThread extends Thread {
+    Server server;
+    String line;
+
+    SubmitThread(Server server, String line) {
+        this.server = server;
+        this.line = line;
+    }
+
+    @Override
+    public void run() {
+        try {
+            Socket cs = new Socket();
+
+            String ServerIp = "61.83.118.69";
+            int port = 5002;
+            cs.connect(new InetSocketAddress(ServerIp, port));
+            OutputStream outputStream = cs.getOutputStream();
+            byte[] data = line.getBytes(StandardCharsets.UTF_8); // 가져온 데이터를 배열에 담음
+            outputStream.write(data); // 배열을 아웃풋스트림으로 전송
+            System.out.println(line + "전송 완료"); // 콘솔에 출력
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
 
 class ServerThread extends Thread {
     Socket ss;
@@ -31,14 +58,16 @@ class ServerThread extends Thread {
 
         while (true) {
             try {
-                ArrayList<String> list = new ArrayList<String>();
+//                ArrayList<String> list = new ArrayList<String>();
 
                 inputStream = ss.getInputStream();
                 byte[] data = new byte[512];
                 int size = inputStream.read(data);//블로킹
                 String inputData = new String(data, 0, size, StandardCharsets.UTF_8);
                 String clientAddress = ss.getInetAddress().getHostName();
-                server.textArea.appendText(clientAddress + " : " + inputData + "\n");
+                String line = clientAddress + " : " + inputData + "\n";
+                server.textArea.appendText(line);
+                new SubmitThread(server, line).start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
