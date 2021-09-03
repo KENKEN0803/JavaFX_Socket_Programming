@@ -25,12 +25,10 @@ import java.nio.charset.StandardCharsets;
 class ChatThread2 extends Thread {
     Socket socket;
     Client client;
-    String nickName;
 
-    ChatThread2(Socket socket, Client client, String nickName) {
+    ChatThread2(Socket socket, Client client) {
         this.socket = socket;
         this.client = client;
-        this.nickName = nickName;
     }
 
     @Override
@@ -39,13 +37,14 @@ class ChatThread2 extends Thread {
             InputStream inputstream = socket.getInputStream();
             while (true) {
                 byte[] data = new byte[512];
-                int size = inputstream.read(data);
+                int size = inputstream.read(data); // 블로킹
                 String s = new String(data, 0, size, StandardCharsets.UTF_8);
-//                System.out.println(s + " 서버에서 데이터 받음");
+                System.out.println(s + " 서버에서 데이터 받음");
                 client.textArea.appendText(s + "\n");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            client.textArea.appendText(e.toString());
         }
     }
 }
@@ -118,7 +117,7 @@ public class Client extends Application {
         hBox4.getChildren().addAll(label3, textField3, btn1, btn2);// 닉네임창
         root.getChildren().addAll(hBox3, hBox4, textArea, hBox2);
 
-        textField3.setOnKeyTyped(keyEvent -> btn1.setDisable(false));
+        textField3.setOnKeyTyped(keyEvent -> btn1.setDisable(false)); // 닉네임 입력시 서버 연결 버튼 활성화
 
         btn1.setOnAction(actionEvent -> { // 서버 연결 버튼
             String nickName = textField3.getText();
@@ -136,7 +135,7 @@ public class Client extends Application {
                 e.printStackTrace();
             }
             // 서버 연결 끝나면 서버로부터 응답 대기
-            new ChatThread2(cs, this, nickName).start();
+            new ChatThread2(cs, this).start();
             btn3.setDisable(false);
         });
 
@@ -151,6 +150,7 @@ public class Client extends Application {
                 textField.setText("");
             } catch (Exception e) {
                 e.printStackTrace();
+                textArea.setText(e.toString());
             }
         });
 
@@ -163,6 +163,7 @@ public class Client extends Application {
                 textField.setText("");
             } catch (Exception e) {
                 e.printStackTrace();
+                textArea.setText(e.toString());
             }
         });
         //------------------------------------
