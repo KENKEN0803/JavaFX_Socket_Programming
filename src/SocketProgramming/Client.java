@@ -41,7 +41,8 @@ class ChatThread2 extends Thread {
                 byte[] data = new byte[512];
                 int size = inputstream.read(data);
                 String s = new String(data, 0, size, StandardCharsets.UTF_8);
-                System.out.println(s + " 서버에서 데이터 받음");
+//                System.out.println(s + " 서버에서 데이터 받음");
+                client.textArea.appendText(s + "\n");
             }
         } catch (Exception e) {
             e.printStackTrace();
