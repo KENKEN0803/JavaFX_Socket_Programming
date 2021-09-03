@@ -75,7 +75,7 @@ public class Client extends Application {
     }
 
     @Override
-    public void start(Stage arg0) throws Exception {
+    public void start(Stage arg0) {
         root.setPrefSize(500, 400); // 창 크기
         root.setSpacing(10);
         root.setPadding(new Insets(15));
@@ -135,14 +135,14 @@ public class Client extends Application {
                 textArea.setText(e.toString());
                 e.printStackTrace();
             }
-
+            // 서버 연결 끝나면 서버로부터 응답 대기
             new ChatThread2(cs, this, nickName).start();
             btn3.setDisable(false);
         });
 
-        btn2.setOnAction(actionEvent -> System.exit(0));
+        btn2.setOnAction(actionEvent -> System.exit(0)); // 나가기 버튼
 
-        textField.setOnAction(actionEvent -> {
+        textField.setOnAction(actionEvent -> { // 채팅 입력창
             try {
                 OutputStream outputStream = cs.getOutputStream();
                 String s = textField.getText();
@@ -154,7 +154,7 @@ public class Client extends Application {
             }
         });
 
-        btn3.setOnAction(actionEvent -> {
+        btn3.setOnAction(actionEvent -> { // 전송 버튼
             try {
                 OutputStream outputStream = cs.getOutputStream();
                 String s = textField.getText();
