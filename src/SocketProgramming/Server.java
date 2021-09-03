@@ -3,6 +3,8 @@ package SocketProgramming;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -31,7 +33,7 @@ class ServerThread extends Thread {
                 byte[] data = new byte[512];
                 int size = inputStream.read(data);//블로킹
                 String s = new String(data, 0, size, StandardCharsets.UTF_8);
-                System.out.println(s + "\n데이터 수신 완료");
+                System.out.println(s);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -63,6 +65,8 @@ class ConnectThread extends Thread {
 public class Server extends Application {
     Button btn1 = new Button("서버 오픈");
     Button btn2 = new Button("테스트2");
+    TextArea textArea = new TextArea();
+    TextField textField = new TextField();
 
     @Override
     public void start(Stage arg0) {
@@ -73,6 +77,12 @@ public class Server extends Application {
 
         btn1.setOnAction(actionEvent -> {
             new ConnectThread().start();
+        });
+
+        textField.setOnAction(actionEvent -> {
+            String input = textField.getText();
+            textArea.appendText(input + "\n");
+            textField.setText("");
         });
 
         root.getChildren().addAll(btn1, btn2); // 한꺼번에 등록시키는 addAll()
