@@ -1,161 +1,155 @@
-//package SocketProgramming;
-//
-//import javafx.application.Application;
-//import javafx.scene.Scene;
-//import javafx.scene.control.Button;
-//import javafx.scene.control.TextArea;
-//import javafx.scene.layout.VBox;
-//import javafx.stage.Stage;
-//
-//import java.io.IOException;
-//import java.io.InputStream;
-//import java.io.OutputStream;
-//import java.net.InetAddress;
-//import java.net.InetSocketAddress;
-//import java.net.ServerSocket;
-//import java.net.Socket;
-//import java.nio.charset.StandardCharsets;
-//
-//class SubmitThread extends Thread {
-//    Server server;
-//    String line;
-//
-//    SubmitThread(Server server, String line) {
-//        this.server = server;
-//        this.line = line;
-//    }
-//
-//    @Override
-//    public void run() {
-//        try {
-//            Socket cs = new Socket();
-//
-//            String ServerIp = "115.22.10.42";
-//            int port = 5001;
-//            cs.connect(new InetSocketAddress(ServerIp, port));
-//            OutputStream outputStream = cs.getOutputStream();
-//            byte[] data = line.getBytes(StandardCharsets.UTF_8); // 가져온 데이터를 배열에 담음
-//            outputStream.write(data); // 배열을 아웃풋스트림으로 전송
-//            System.out.println(line + "전송 완료"); // 콘솔에 출력
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//}
-//
-//class ServerThread extends Thread {
-//    Socket ss;
-//    Server server;
-//
-//    ServerThread(Socket ss, Server server) {
-//        this.ss = ss;
-//        this.server = server;
-//    }
-//
-//    @Override
-//    public void run() {
-//        InputStream inputStream = null;
-//
-//        while (true) {
-//            try {
-////                ArrayList<String> list = new ArrayList<String>();
-//
-//                inputStream = ss.getInputStream();
-//                byte[] data = new byte[512];
-//                int size = inputStream.read(data);//블로킹
-//                String inputData = new String(data, 0, size, StandardCharsets.UTF_8);
-//                String clientAddress = ss.getInetAddress().getHostName();
-//                String line = clientAddress + " : " + inputData + "\n";
-//                server.textArea.appendText(line);
-//                new SubmitThread(server, line).start();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-//}
-//
-//class ConnectThread extends Thread {
-//
-//    Server server;
-//
-//    ConnectThread(Server server) {
-//        this.server = server;
-//    }
-//
-//    @Override
-//    public void run() {
-//        try {
-//            ServerSocket mss = new ServerSocket();
-//            server.textArea.appendText("소캣 생성 완료\n");
-//            mss.bind(new InetSocketAddress(InetAddress.getLocalHost(), 5001));
-//            server.textArea.appendText("바인딩 완료\n");
-//
-//            while (true) {
-//                Socket ss = mss.accept(); // 블로킹
-//                new ServerThread(ss, server).start();
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//}
-//
-//public class Server extends Application {
-//    Button btn1 = new Button("서버 오픈");
-//    Button btn2 = new Button("테스트2");
-//    TextArea textArea = new TextArea();
-//
-//    @Override
-//    public void start(Stage arg0) {
-//        VBox root = new VBox(); // root 최상단
-//        root.setPrefSize(400, 300); // 창의 가로길이 세로길이 a설정.
-//        root.setSpacing(15); // 사이 간격을 띄운다.
-//        //-----------------------------------------------------------------------
-//
-//        btn1.setOnAction(actionEvent -> {
-//            new ConnectThread(this).start();
-//        });
-//
-//
-//        root.getChildren().addAll(btn1, btn2, textArea); // 한꺼번에 등록시키는 addAll()
-//        Scene scene = new Scene(root); // scene : 한장면을 그리기위한 바탕.
-//        arg0.setScene(scene);
-//        arg0.setTitle("Server");// 제목
-//        arg0.show();
-//        //-----------------------------------------------------------------------
-//        arg0.setTitle("서버");// 제목
-//        arg0.show();
-//    }
-//
-//    public static void main(String[] args) {
-//        System.out.println("서버 스타트");
-//        launch();
-//    }
-//}
-//
-//
-////public class Server {
-////    public static void main(String[] args) {
-////        System.out.println("서버 스타트");
-////        try {
-////            ServerSocket mss = new ServerSocket();
-////            System.out.println("메인 서버 소캣 생성!");
-////            mss.bind(new InetSocketAddress(InetAddress.getLocalHost(), 5001));
-////            System.out.println("바인딩 완료");
-////            Socket ss = mss.accept(); // 블로킹
-////            System.out.println("누군가 접속 합니다...");
-////            InputStream inputStream = ss.getInputStream();
-////            byte[] data = new byte[512];
-////
-////            int size = inputStream.read(data);//블로킹
-////            String s = new String(data, 0, size, StandardCharsets.UTF_8);
-////            System.out.println(s + " 데이터 받음");
-////
-////        } catch (IOException e) {
-////            e.printStackTrace();
-////        }
-//////        new Scanner(System.in).nextInt();
-////        System.out.println("서버 엔드");
-////    }
-////}
+package SocketProgramming;
+
+import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedList;
+
+class ClientThread extends Thread {
+    static String ns;
+    Socket socket;
+    Server server;
+    LinkedList<Socket> chat = new LinkedList<Socket>();
+
+    ClientThread(LinkedList<Socket> chat, Socket socket, Server server) {
+        this.socket = socket;
+        this.chat = chat;
+        this.server = server;
+    }
+
+    @Override
+    public void run() {
+        try {
+            InputStream inputstream = socket.getInputStream();
+            byte[] name = new byte[32];
+            int nsize = inputstream.read(name);
+            ns = new String(name, 0, nsize, StandardCharsets.UTF_8);
+
+            while (true) {
+                if (socket == null) {
+                    server.textArea.appendText(" 님이 나갔습니다.\n");
+                }
+                //블로킹
+                byte[] data = new byte[512];
+
+                int size = inputstream.read(data);
+                String s = new String(data, 0, size, StandardCharsets.UTF_8);
+                System.out.println(s + " 데이터 받음");
+                new ChatThread(chat, s, ns).start();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            server.textArea.appendText(ns + " 님이 나갔습니다.\n");
+        }
+    }
+}
+
+class ChatThread extends Thread {
+    String s;
+    LinkedList<Socket> chat = new LinkedList<Socket>();
+
+    ChatThread(LinkedList<Socket> chat, String s, String ns) {
+        this.chat = chat;
+        this.s = ns + " : " + s;
+    }
+
+    @Override
+    public void run() {
+
+        for (Socket socket2 : chat) {
+            //System.out.println(chat2);
+            try {
+
+                System.out.println(socket2.getInetAddress() + " 접속함");
+                OutputStream outputStream = socket2.getOutputStream();
+                byte[] data = s.getBytes(StandardCharsets.UTF_8);//한글
+                outputStream.write(data);
+                System.out.println("데이터 보냄");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+}
+
+class ConnectThread extends Thread {
+    Server server;
+
+    ConnectThread(Server server) {
+        this.server = server;
+    }
+
+    @Override
+    public void run() {
+        LinkedList<Socket> chat = new LinkedList<Socket>();
+        try {
+            ServerSocket mss = new ServerSocket();
+            System.out.println("메인 서버 소켓 생성");
+            //mss.bind(new InetSocketAddress("localhost", 5001));
+            mss.bind(new InetSocketAddress(InetAddress.getLocalHost(), 5001));
+            System.out.println("바인딩 완료");
+
+            while (true) {
+                // 블로킹
+                Socket ss = mss.accept();
+                chat.add(ss);
+                //System.out.println(ss.getInetAddress() + " 접속함");
+                server.textArea.appendText(ss.getInetAddress() + " 님이 접속했습니다.\n");
+                //링크드리스트 던지기
+                new ClientThread(chat, ss, server).start();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+public class Server extends Application {
+    Button btn1 = new Button("서버 오픈");
+    TextArea textArea = new TextArea();
+
+    public static void main(String[] args) {
+        launch();
+    }
+
+    @Override
+    public void start(Stage arg0) throws Exception {
+        VBox root = new VBox();
+        root.setPrefSize(400, 300); // 창 크기
+        root.setSpacing(15);
+        //-------------------------------------
+        // 이 영역에 모든 코드가 들어감
+        // 방법 2
+
+        root.getChildren().addAll(btn1, textArea);
+
+        btn1.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent arg0) {
+                new ConnectThread(Server.this).start();
+            }
+        });
+
+        //-------------------------------------
+        Scene scene = new Scene(root);
+        arg0.setScene(scene); // 위의 설정값들을 적용
+        arg0.setTitle("Server"); // 제목
+        arg0.show(); // 창 띄움
+
+    }
+}

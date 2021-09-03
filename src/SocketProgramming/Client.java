@@ -140,14 +140,14 @@ public class Client extends Application {
         });
 
         btn2.setOnAction(actionEvent -> {
-            try {
-                OutputStream outputStream = cs.getOutputStream();
-                String s = "님이 나갔습니다.";
-                byte[] data = s.getBytes(StandardCharsets.UTF_8);
-                outputStream.write(data);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            try {
+//                OutputStream outputStream = cs.getOutputStream();
+//                String s = "님이 나갔습니다.";
+//                byte[] data = s.getBytes(StandardCharsets.UTF_8);
+//                outputStream.write(data);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
             System.exit(0);
         }); // 나가기 버튼
 
