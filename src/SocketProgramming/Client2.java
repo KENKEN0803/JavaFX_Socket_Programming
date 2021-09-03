@@ -87,9 +87,9 @@ public class Client2 extends Application {
 
         textField.setPrefWidth(400);
         textField.setPrefHeight(30);
-        textField1.setPrefWidth(200);
+        textField1.setPrefWidth(150);
         textField1.setText("115.22.10.42");
-        textField2.setPrefWidth(200);
+        textField2.setPrefWidth(150);
         textField2.setText("5001");
 //        textField3.setText();
 
