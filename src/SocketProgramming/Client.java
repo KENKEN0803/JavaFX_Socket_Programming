@@ -118,17 +118,16 @@ public class Client extends Application {
         hBox4.getChildren().addAll(label3, textField3, btn1, btn2);// 닉네임창
         root.getChildren().addAll(hBox3, hBox4, textArea, hBox2);
 
-
         textField3.setOnKeyTyped(keyEvent -> btn1.setDisable(false));
 
-
-        btn1.setOnAction(actionEvent -> {
+        btn1.setOnAction(actionEvent -> { // 서버 연결 버튼
             String nickName = textField3.getText();
             cs = new Socket();
             try {
                 String serverAddress = textField1.getText();
                 int serverPort = Integer.parseInt(textField2.getText());
                 cs.connect(new InetSocketAddress(serverAddress, serverPort));
+                // 서버 연결 끝나면 닉네임 서버로 전송
                 OutputStream outputStream = cs.getOutputStream();
                 byte[] data = nickName.getBytes(StandardCharsets.UTF_8);
                 outputStream.write(data);
