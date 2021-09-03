@@ -13,7 +13,6 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
 
 class ClientThread extends Thread {
     Client client;
@@ -25,19 +24,18 @@ class ClientThread extends Thread {
     @Override
     public void run() {
         try {
-            Scanner sc = new Scanner(System.in);
             Socket cs = new Socket();
 
             String ip = "61.83.118.69";
-
-            cs.connect(new InetSocketAddress(ip, 5001));
+            int port = 5001;
+            cs.connect(new InetSocketAddress(ip, port));
             OutputStream outputStream = cs.getOutputStream();
 
             String input = client.textField.getText(); // 텍스트필드에서 텍스트 가져옴
             byte[] data = input.getBytes(StandardCharsets.UTF_8); // 가져온 데이터를 배열에 담음
             outputStream.write(data); // 배열을 아웃풋스트림으로 전송
-            System.out.println(input + "전송 완료");
-            client.textField.setText("");
+            System.out.println(input + "전송 완료"); // 콘솔에 출력
+            client.textField.setText(""); // 텍스트필드를 공백으로 돌림
         } catch (IOException e) {
             e.printStackTrace();
         }
