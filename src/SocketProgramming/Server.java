@@ -31,7 +31,7 @@ class ServerThread extends Thread {
                 byte[] data = new byte[512];
                 int size = inputStream.read(data);//블로킹
                 String s = new String(data, 0, size, StandardCharsets.UTF_8);
-                System.out.println(s + " 데이터 받음");
+                System.out.println(s + "\n데이터 수신 완료");
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -69,7 +69,7 @@ public class Server extends Application {
         VBox root = new VBox(); // root 최상단
         root.setPrefSize(400, 300); // 창의 가로길이 세로길이 a설정.
         root.setSpacing(15); // 사이 간격을 띄운다.
-        // -----------------------------------------------------------------------
+        //-----------------------------------------------------------------------
 
         btn1.setOnAction(actionEvent -> {
             new ConnectThread().start();
@@ -80,7 +80,7 @@ public class Server extends Application {
         arg0.setScene(scene);
         arg0.setTitle("Server");// 제목
         arg0.show();
-//		---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //-----------------------------------------------------------------------
         arg0.setTitle("서버");// 제목
         arg0.show();
     }

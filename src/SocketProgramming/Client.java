@@ -16,13 +16,6 @@ import java.util.Scanner;
 class ClientThread extends Thread {
     @Override
     public void run() {
-
-    }
-}
-
-class ConnectThread1 extends Thread {
-    @Override
-    public void run() {
         try {
             Socket cs = new Socket();
             System.out.println("문자 입력...");
@@ -39,8 +32,8 @@ class ConnectThread1 extends Thread {
 }
 
 public class Client extends Application {
-    Button btn1 = new Button("서버에 접속하기");
-    Button btn2 = new Button("테스트2");
+    Button btn1 = new Button("테스트");
+    Button btn2 = new Button("서버에 접속하기");
 
     @Override
     public void start(Stage arg0) throws Exception {
@@ -49,12 +42,12 @@ public class Client extends Application {
         root.setSpacing(15); // 사이 간격을 띄운다.
         // -----------------------------------------------------------------------
 
-        btn1.setOnAction(actionEvent -> {
-            new ConnectThread1().start();
+        btn2.setOnAction(actionEvent -> {
+            new ClientThread().start();
         });
 
+        // -----------------------------------------------------------------------
         root.getChildren().addAll(btn1, btn2); // 한꺼번에 등록시키는 addAll()
-//		---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         Scene scene = new Scene(root); // scene : 한장면을 그리기위한 바탕.
         arg0.setScene(scene);
         arg0.setTitle("클라이언트");// 제목
