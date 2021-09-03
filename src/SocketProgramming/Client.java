@@ -14,6 +14,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+
 class ClientThread extends Thread {
     Client client;
 
@@ -26,9 +27,9 @@ class ClientThread extends Thread {
         try {
             Socket cs = new Socket();
 
-            String ip = "61.83.118.69";
+            String Serverip = "61.83.118.69";
             int port = 5001;
-            cs.connect(new InetSocketAddress(ip, port));
+            cs.connect(new InetSocketAddress(Serverip, port));
             OutputStream outputStream = cs.getOutputStream();
 
             String input = client.textField.getText(); // 텍스트필드에서 텍스트 가져옴
@@ -44,7 +45,7 @@ class ClientThread extends Thread {
 
 public class Client extends Application {
     Button btn1 = new Button("서버에 접속하기");
-    Button btn2 = new Button("서버에 접속하기");
+    Button btn2 = new Button("---");
     TextArea textArea = new TextArea();
     TextField textField = new TextField();
 

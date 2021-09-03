@@ -32,6 +32,7 @@ class ServerThread extends Thread {
         while (true) {
             try {
                 ArrayList<String> list = new ArrayList<String>();
+
                 inputStream = ss.getInputStream();
                 byte[] data = new byte[512];
                 int size = inputStream.read(data);//블로킹
