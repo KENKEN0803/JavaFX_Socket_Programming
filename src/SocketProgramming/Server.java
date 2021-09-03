@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -12,7 +13,6 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
 
 class ServerThread extends Thread {
     Socket ss;
@@ -63,6 +63,7 @@ class ConnectThread extends Thread {
 public class Server extends Application {
     Button btn1 = new Button("서버 오픈");
     Button btn2 = new Button("테스트2");
+
     @Override
     public void start(Stage arg0) {
         VBox root = new VBox(); // root 최상단

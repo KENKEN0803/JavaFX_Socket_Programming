@@ -1,21 +1,19 @@
 package SocketProgramming;
 
-        import javafx.application.Application;
-        import javafx.scene.Scene;
-        import javafx.scene.control.Button;
-        import javafx.scene.layout.VBox;
-        import javafx.stage.Stage;
-        import java.io.IOException;
-        import java.io.InputStream;
-        import java.io.OutputStream;
-        import java.net.InetAddress;
-        import java.net.InetSocketAddress;
-        import java.net.ServerSocket;
-        import java.net.Socket;
-        import java.nio.charset.StandardCharsets;
-        import java.util.Scanner;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
-class ClientThread extends Thread{
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
+
+class ClientThread extends Thread {
     @Override
     public void run() {
 
@@ -41,8 +39,9 @@ class ConnectThread1 extends Thread {
 }
 
 public class Client extends Application {
-    Button btn1 = new Button("클라이언트");
+    Button btn1 = new Button("서버에 접속하기");
     Button btn2 = new Button("테스트2");
+
     @Override
     public void start(Stage arg0) throws Exception {
         VBox root = new VBox(); // root 최상단
