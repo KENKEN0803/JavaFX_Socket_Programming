@@ -40,7 +40,7 @@ class ChatThread2 extends Thread {
                 int size = inputstream.read(data); // 블로킹
                 String s = new String(data, 0, size, StandardCharsets.UTF_8);
                 System.out.println(s + " 서버에서 데이터 받음");
-                client.textArea.appendText(s + "\n");
+                client.textArea.appendText(s);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -144,7 +144,7 @@ public class Client extends Application {
         textField.setOnAction(actionEvent -> { // 채팅 입력창
             try {
                 OutputStream outputStream = cs.getOutputStream();
-                String s = textField.getText();
+                String s = textField.getText() + "\n";
                 byte[] data = s.getBytes(StandardCharsets.UTF_8);
                 outputStream.write(data);
                 textField.setText("");
@@ -157,7 +157,7 @@ public class Client extends Application {
         btn3.setOnAction(actionEvent -> { // 전송 버튼
             try {
                 OutputStream outputStream = cs.getOutputStream();
-                String s = textField.getText();
+                String s = textField.getText() + "\n";
                 byte[] data = s.getBytes(StandardCharsets.UTF_8);
                 outputStream.write(data);
                 textField.setText("");
