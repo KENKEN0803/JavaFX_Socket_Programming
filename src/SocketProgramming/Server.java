@@ -4,7 +4,6 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -15,12 +14,15 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 class ServerThread extends Thread {
     Socket ss;
+    Server server;
 
-    ServerThread(Socket ss) {
+    ServerThread(Socket ss, Server server) {
         this.ss = ss;
+        this.server = server;
     }
 
     @Override
@@ -29,12 +31,13 @@ class ServerThread extends Thread {
 
         while (true) {
             try {
+                ArrayList<String> list = new ArrayList<String>();
                 inputStream = ss.getInputStream();
                 byte[] data = new byte[512];
                 int size = inputStream.read(data);//블로킹
-                String s = new String(data, 0, size, StandardCharsets.UTF_8);
-                System.out.println(s);
-
+                String inputData = new String(data, 0, size, StandardCharsets.UTF_8);
+                String clientAddress = ss.getInetAddress().getHostName();
+                server.textArea.appendText(clientAddress + " : " + inputData + "\n");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -43,18 +46,24 @@ class ServerThread extends Thread {
 }
 
 class ConnectThread extends Thread {
+
+    Server server;
+
+    ConnectThread(Server server) {
+        this.server = server;
+    }
+
     @Override
     public void run() {
         try {
             ServerSocket mss = new ServerSocket();
-            System.out.println("메인 서버 소캣 생성!");
+            server.textArea.appendText("소캣 생성 완료\n");
             mss.bind(new InetSocketAddress(InetAddress.getLocalHost(), 5001));
-            System.out.println("바인딩 완료");
+            server.textArea.appendText("바인딩 완료\n");
 
             while (true) {
                 Socket ss = mss.accept(); // 블로킹
-                System.out.println("누군가 접속 합니다...");
-                new ServerThread(ss).start();
+                new ServerThread(ss, server).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -66,7 +75,6 @@ public class Server extends Application {
     Button btn1 = new Button("서버 오픈");
     Button btn2 = new Button("테스트2");
     TextArea textArea = new TextArea();
-    TextField textField = new TextField();
 
     @Override
     public void start(Stage arg0) {
@@ -76,16 +84,11 @@ public class Server extends Application {
         //-----------------------------------------------------------------------
 
         btn1.setOnAction(actionEvent -> {
-            new ConnectThread().start();
+            new ConnectThread(this).start();
         });
 
-        textField.setOnAction(actionEvent -> {
-            String input = textField.getText();
-            textArea.appendText(input + "\n");
-            textField.setText("");
-        });
 
-        root.getChildren().addAll(btn1, btn2); // 한꺼번에 등록시키는 addAll()
+        root.getChildren().addAll(btn1, btn2, textArea); // 한꺼번에 등록시키는 addAll()
         Scene scene = new Scene(root); // scene : 한장면을 그리기위한 바탕.
         arg0.setScene(scene);
         arg0.setTitle("Server");// 제목
