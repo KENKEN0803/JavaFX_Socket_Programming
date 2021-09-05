@@ -56,11 +56,11 @@ public class Client extends Application {
     HBox hBox2 = new HBox();
     HBox hBox3 = new HBox();
     HBox hBox4 = new HBox();
-    TextArea textArea = new TextArea();
-    TextField textField = new TextField();
-    TextField textField1 = new TextField();
-    TextField textField2 = new TextField();
-    TextField textField3 = new TextField();
+    TextArea textArea = new TextArea(); // 채팅창
+    TextField textField = new TextField(); // 채팅전송창
+    TextField textField1 = new TextField(); // 서버주소창
+    TextField textField2 = new TextField(); // 포트창
+    TextField textField3 = new TextField(); // 닉네임창
     Button btn1 = new Button("서버 연결!");
     Button btn2 = new Button("방 나가기");
     Button btn3 = new Button("전송");
@@ -87,6 +87,7 @@ public class Client extends Application {
 
         btn1.setDisable(true);
         btn3.setDisable(true);
+        textField.setEditable(false);
 
         textField.setPrefWidth(400);
         textField.setPrefHeight(30);
@@ -112,7 +113,7 @@ public class Client extends Application {
 
         // 이 영역에 모든 코드가 들어감
         // 방법 2
-        hBox2.getChildren().addAll(textField, btn3);//입력-전송창
+        hBox2.getChildren().addAll(textField, btn3); //입력-전송창
         hBox3.getChildren().addAll(label1, textField1, label2, textField2); //서버주소, 포트번호
         hBox4.getChildren().addAll(label3, textField3, btn1, btn2);// 닉네임창
         root.getChildren().addAll(hBox3, hBox4, textArea, hBox2);
@@ -124,32 +125,36 @@ public class Client extends Application {
             cs = new Socket();
             try {
                 String serverAddress = textField1.getText();
+                serverAddress = serverAddress.trim(); // 서버주소 공백 제거
                 int serverPort = Integer.parseInt(textField2.getText());
                 cs.connect(new InetSocketAddress(serverAddress, serverPort));
-                // 서버 연결 끝나면 닉네임 서버로 전송
+                // 서버 연결 성공하면 닉네임을 서버로 전송
                 OutputStream outputStream = cs.getOutputStream();
                 byte[] data = nickName.getBytes(StandardCharsets.UTF_8);
                 outputStream.write(data);
+                //서버로부터 응답을 기다리는 스레드 생성
+                new ChatThread2(cs, this).start();
+                btn3.setDisable(false); // 전송 버튼 활성화
+                textField.setEditable(true); // 전송창 활성화
+                textArea.setText(serverAddress + ":" + serverPort + "접속 성공!" + "\n");
             } catch (Exception e) {
                 textArea.setText(e.toString());
                 e.printStackTrace();
             }
-            // 서버 연결 끝나면 서버로부터 응답 대기
-            new ChatThread2(cs, this).start();
-            btn3.setDisable(false);
         });
 
-        btn2.setOnAction(actionEvent -> {
-//            try {
-//                OutputStream outputStream = cs.getOutputStream();
-//                String s = "님이 나갔습니다.";
-//                byte[] data = s.getBytes(StandardCharsets.UTF_8);
-//                outputStream.write(data);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-            System.exit(0);
-        }); // 나가기 버튼
+        btn2.setOnAction(actionEvent -> {// 나가기 버튼
+            try {
+                OutputStream outputStream = cs.getOutputStream();
+                String s = "님이 나갔습니다.";
+                byte[] data = s.getBytes(StandardCharsets.UTF_8);
+                outputStream.write(data);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }finally {
+                System.exit(0);
+            }
+        });
 
         textField.setOnAction(actionEvent -> { // 채팅 입력창
             try {
@@ -184,122 +189,3 @@ public class Client extends Application {
 
     }
 }
-
-
-
-/*
-//ex75 UI 에서 통신
-class ConnectThread2 extends Thread{
-	@Override
-	public void run() {
-		try {
-			Socket cs = new Socket();
-
-			//cs.connect(new InetSocketAddress("localhost", 5001));
-			cs.connect(new InetSocketAddress("220.119.22.165", 5001));
-			System.out.println("접속 완료");
-
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-}
-public class Client extends Application{
-	Socket cs;
-	@Override
-	public void start(Stage arg0) throws Exception {
-		VBox root = new VBox();
-		root.setPrefSize(400, 300); // 창 크기
-		root.setSpacing(15);
-		//-------------------------------------
-		// 이 영역에 모든 코드가 들어감
-		// 방법 2
-		Button btn1 = new Button("서버에 연결");
-		Button btn2 = new Button("버튼2");
-
-		root.getChildren().addAll(btn1, btn2);
-
-		btn1.setOnAction(new EventHandler<ActionEvent>() {
-
-			@Override
-			public void handle(ActionEvent arg0) {
-				cs = new Socket();
-
-				try {
-					//cs.connect(new InetSocketAddress("localhost", 5001));
-					cs.connect(new InetSocketAddress("220.119.22.165", 5001));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		});
-
-		btn2.setOnAction(new EventHandler<ActionEvent>() {
-			int count = 0;
-			@Override
-			public void handle(ActionEvent arg0) {
-				try {
-					OutputStream outputStream = cs.getOutputStream();
-					String s ="apple" + count++;
-					byte[] data = s.getBytes();
-					outputStream.write(data);
-					System.out.println("데이터 보냄");
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-
-		//-------------------------------------
-		Scene scene = new Scene(root);
-		arg0.setScene(scene); // 위의 설정값들을 적용
-		arg0.setTitle("Client"); // 제목
-		arg0.show(); // 창 띄움
-
-	}
-
-	public static void main(String[] args) {
-		launch();
-	}
-}
-*/
-
-
-/*
-//ex 74 server - client 통신
-public class Client {
-
-	public static void main(String[] args) {
-		System.out.println("Client Start");
-
-
-		try {
-			Socket cs = new Socket();
-
-			System.out.println("숫자를 입력하면 접속을 시도합니다.");
-			new Scanner(System.in).nextInt();
-			// cs.connect(new InetSocketAddress("localhost", 5001));
-			cs.connect(new InetSocketAddress("220.119.22.165", 5001));
-			System.out.println("접속 완료");
-			System.out.println("숫자를 입력하면 데이터를 전송합니다.");
-			new Scanner(System.in).nextInt();
-
-			OutputStream outputStream = cs.getOutputStream();
-			String s ="apple";
-			byte[] data = s.getBytes();
-			outputStream.write(data);
-			System.out.println("데이터 보냄");
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-
-
-		new Scanner(System.in).nextInt();
-		System.out.println("Client End");
-	}
-
-}
-*/
